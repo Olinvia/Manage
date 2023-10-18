@@ -1,20 +1,20 @@
 package com.example.demo.service.impl;
 
-import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.example.demo.entity.User;
 import com.example.demo.mapper.UserMapper;
-import com.example.demo.service.UserService;
+import com.example.demo.service.IUserService;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import java.util.List;
-
+/**
+ * <p>
+ *  服务实现类
+ * </p>
+ *
+ * @author lxq
+ * @since 2023-10-18
+ */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
-    @Resource
-    private UserMapper userMapper;
-    @Override
-        public List<User> ListAll(){
-            return userMapper.ListAll();
-    }
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements IUserService {
+
 }
