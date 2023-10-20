@@ -58,12 +58,12 @@ public class UserController {
 
     //查询
     @PostMapping("/query")
-    public List<User> query(@RequestBody User user){
+    public Result query(@RequestBody User user){
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
         if(StringUtils.isNotBlank(user.getUserName())){
             lambdaQueryWrapper.like(User::getUserName,user.getUserName());
         }
-        return userService.list(lambdaQueryWrapper);
+        return Result.success(userService.list(lambdaQueryWrapper));
     }
 
     @PostMapping("/listPage")
@@ -109,7 +109,6 @@ public class UserController {
 
     @PostMapping("/result")
     public Result ListResult(@RequestBody QueryPageParam query){
-        System.out.println(query);
 
         Page<User> page = new Page();
         page.setCurrent(query.getPageNum());
@@ -117,9 +116,17 @@ public class UserController {
 
         HashMap param = query.getParam();
         String name = (String)param.get("name");
+        String sex = (String)param.get("sex");
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
-        lambdaQueryWrapper.like(User::getUserName,name);
+        if(StringUtils.isNotBlank(name) && !"null".equals(name)){
+            lambdaQueryWrapper.like(User::getUserName,name);
+        }
+        if(StringUtils.isNotBlank(sex)){
+            lambdaQueryWrapper.like(User::getSex,sex);
+        }
+
+
 
         IPage result = userService.pageCC(page,lambdaQueryWrapper);
 

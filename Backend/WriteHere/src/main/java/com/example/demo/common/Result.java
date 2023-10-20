@@ -21,6 +21,11 @@ public class Result {
         return result(200,"success",total,data);
     }
 
+    public static Result success(Object data){
+        return result(200,"success",0L,data);
+    }
+
+
     public static Result result(int code, String msg, Long total, Object data){
         Result res = new Result();
         res.setCode(code);
