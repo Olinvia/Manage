@@ -3,6 +3,7 @@ package com.example.demo.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.QueryPageParam;
 import com.example.demo.common.Result;
@@ -59,13 +60,14 @@ public class UserController {
     @PostMapping("/query")
     public List<User> query(@RequestBody User user){
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
-        lambdaQueryWrapper.like(User::getUserName,user.getUserName());
+        if(StringUtils.isNotBlank(user.getUserName())){
+            lambdaQueryWrapper.like(User::getUserName,user.getUserName());
+        }
         return userService.list(lambdaQueryWrapper);
     }
 
     @PostMapping("/listPage")
     public List<User> listPage(@RequestBody QueryPageParam query){
-        System.out.println(query);
 
         Page<User> page = new Page();
         page.setCurrent(query.getPageNum());
