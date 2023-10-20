@@ -2,11 +2,16 @@ package com.example.demo.controller;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.demo.common.QueryPageParam;
+import com.example.demo.common.Result;
 import com.example.demo.entity.User;
 import com.example.demo.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -58,5 +63,67 @@ public class UserController {
         return userService.list(lambdaQueryWrapper);
     }
 
+    @PostMapping("/listPage")
+    public List<User> listPage(@RequestBody QueryPageParam query){
+        System.out.println(query);
+
+        Page<User> page = new Page();
+        page.setCurrent(query.getPageNum());
+        page.setSize(query.getPageSize());
+
+        HashMap param = query.getParam();
+        String name = (String)param.get("name");
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
+        lambdaQueryWrapper.like(User::getUserName,name);
+
+        IPage result = userService.page(page,lambdaQueryWrapper);
+
+        System.out.println(result.getTotal());
+
+        return result.getRecords();
+    }
+
+    @PostMapping("/listPageC")
+    public List<User> listPageC(@RequestBody QueryPageParam query){
+        System.out.println(query);
+
+        Page<User> page = new Page();
+        page.setCurrent(query.getPageNum());
+        page.setSize(query.getPageSize());
+
+        HashMap param = query.getParam();
+        String name = (String)param.get("name");
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
+        lambdaQueryWrapper.like(User::getUserName,name);
+
+        IPage result = userService.pageCC(page,lambdaQueryWrapper);
+
+        System.out.println(result.getTotal());
+
+        return result.getRecords();
+    }
+
+    @PostMapping("/result")
+    public Result ListResult(@RequestBody QueryPageParam query){
+        System.out.println(query);
+
+        Page<User> page = new Page();
+        page.setCurrent(query.getPageNum());
+        page.setSize(query.getPageSize());
+
+        HashMap param = query.getParam();
+        String name = (String)param.get("name");
+
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
+        lambdaQueryWrapper.like(User::getUserName,name);
+
+        IPage result = userService.pageCC(page,lambdaQueryWrapper);
+
+        System.out.println(result.getTotal());
+
+        return Result.success(result.getTotal(),result.getRecords());
+    }
 
 }
