@@ -35,13 +35,13 @@ public class UserController {
 
     //新增
     @PostMapping("/save")
-    public boolean save(@RequestBody User user){
-        return userService.save(user);
+    public Result save(@RequestBody User user){
+        return userService.save(user)?Result.success():Result.fail();
     }
     //修改
     @PostMapping("/mod")
-    public boolean mod(@RequestBody User user){
-        return userService.updateById(user);
+    public Result mod(@RequestBody User user){
+        return userService.updateById(user)?Result.success():Result.fail();
     }
 
     //新增或修改
@@ -52,8 +52,18 @@ public class UserController {
 
     //删除
     @PostMapping("/delete")
-    public boolean delete(Integer id){
-        return userService.removeById(id);
+    public Result delete(Integer id){
+        return userService.removeById(id)?Result.success():Result.fail();
+    }
+
+    @PostMapping("/findByNum")
+    public Result findByNum(String num){
+        LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
+        if(StringUtils.isNotBlank(num)){
+            lambdaQueryWrapper.eq(User::getNum,num);
+        }
+        List list = userService.list(lambdaQueryWrapper);
+        return !list.isEmpty() ?Result.success(list):Result.fail();
     }
 
     //查询
