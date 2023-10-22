@@ -44,6 +44,13 @@ public class UserController {
         return userService.updateById(user)?Result.success():Result.fail();
     }
 
+    @PostMapping("/login")
+    public Result login(@RequestBody User user){
+        List list = userService.lambdaQuery().eq(User::getNum,user.getNum())
+                .eq(User::getPs,user.getPs()).list();
+        return !list.isEmpty() ?Result.success(list.get(0)):Result.fail();
+    }
+
     //新增或修改
     @PostMapping("/saveormod")
     public boolean saveormod(@RequestBody User user){

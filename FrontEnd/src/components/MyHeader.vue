@@ -6,7 +6,7 @@
     <div style="flex: 1;text-align: center; font-size: 34px;">
       <span>欢迎来到仓库管理系统</span>
     </div>
-    <span>王小虎</span>
+    <span>{{user.userName}}</span>
     <el-dropdown style="cursor: pointer;">
       <i class="el-icon-arrow-down" style="margin-left: 15px"></i>
       <el-dropdown-menu slot="dropdown">
@@ -24,6 +24,11 @@
 <script>
   export default {
     name: "MyHeader",
+    data(){
+      return{
+        user: JSON.parse(sessionStorage.getItem('CurUser'))
+      }
+    },
     props:{
       icon:String
     },
@@ -32,7 +37,8 @@
         console.log('to_user')
       },
       logout(){
-        console.log('logout')
+        this.$router.push("/")
+        sessionStorage.clear()
       },
       collapse(){
         this.$emit('doCollapse')

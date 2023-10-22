@@ -12,5 +12,5 @@ create table user(
     isValid varchar(4) default 'Y' null comment "有效"    
 );
 
-insert into user values(1,"root","超级管理员","123456",
-18,0,"18962321359",0,'Y');
+insert into user values(9,"han","hansummer","123456",
+18,1,"18962321359",2,'Y');
