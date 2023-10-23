@@ -34,7 +34,7 @@
     },
     methods:{
       toUser(){
-        console.log('to_user')
+        this.$router.push("/MyHome")
       },
       logout(){
         this.$router.push("/")
@@ -43,6 +43,9 @@
       collapse(){
         this.$emit('doCollapse')
       }
+    },
+    created(){
+      this.$router.push("/MyHome")
     }
   };
 </script>

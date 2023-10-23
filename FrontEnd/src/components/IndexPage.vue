@@ -10,7 +10,7 @@
     </el-header>
 
     <el-main>
-      <MyMain></MyMain>
+      <router-view/>
     </el-main>
   </el-container>
   </el-container>
@@ -35,11 +35,10 @@
 <script>
 import MyAside from "@/components/MyAside.vue";
 import MyHeader from "@/components/MyHeader.vue";
-import MyMain from "@/components/MyMain.vue";
 
 export default {
   name: 'IndexPage',
-  components: {MyMain, MyHeader, MyAside},
+  components: { MyHeader, MyAside},
   data(){
     return{
       isCollapse:false,
