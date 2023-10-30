@@ -7,7 +7,9 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.QueryPageParam;
 import com.example.demo.common.Result;
+import com.example.demo.entity.Menu;
 import com.example.demo.entity.User;
+import com.example.demo.service.IMenuService;
 import com.example.demo.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -28,6 +30,8 @@ import java.util.List;
 public class UserController {
     @Autowired
     private IUserService userService;
+    @Autowired
+    private IMenuService menuService;
     @GetMapping("/list")
     public List<User> list(){
         return userService.list();
@@ -48,7 +52,16 @@ public class UserController {
     public Result login(@RequestBody User user){
         List list = userService.lambdaQuery().eq(User::getNum,user.getNum())
                 .eq(User::getPs,user.getPs()).list();
-        return !list.isEmpty() ?Result.success(list.get(0)):Result.fail();
+
+        if(!list.isEmpty()){
+            User user1 = (User)list.get(0);
+            List menuList = menuService.lambdaQuery().like(Menu::getMenuright,user1.getRoleId()).list();
+            HashMap res = new HashMap();
+            res.put("user",user1);
+            res.put("menu",menuList);
+            return Result.success(res);
+        }
+        return Result.fail();
     }
 
     //新增或修改
@@ -105,7 +118,6 @@ public class UserController {
 
     @PostMapping("/listPageC")
     public List<User> listPageC(@RequestBody QueryPageParam query){
-        System.out.println(query);
 
         Page<User> page = new Page();
         page.setCurrent(query.getPageNum());
@@ -134,6 +146,7 @@ public class UserController {
         HashMap param = query.getParam();
         String name = (String)param.get("name");
         String sex = (String)param.get("sex");
+        String roleId=(String)param.get("roleId");
 
         LambdaQueryWrapper<User> lambdaQueryWrapper = new LambdaQueryWrapper<User>();
         if(StringUtils.isNotBlank(name) && !"null".equals(name)){
@@ -141,6 +154,9 @@ public class UserController {
         }
         if(StringUtils.isNotBlank(sex)){
             lambdaQueryWrapper.like(User::getSex,sex);
+        }
+        if(StringUtils.isNotBlank(roleId)){
+            lambdaQueryWrapper.like(User::getRoleId,roleId);
         }
 
 

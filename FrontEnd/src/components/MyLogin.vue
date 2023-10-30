@@ -86,7 +86,9 @@
           if(valid){
             this.$axios.post(this.$httpUrl+'/user/login',this.loginForm).then(res=>res.data).then(res=>{
               if(res.code === 200){
-                sessionStorage.setItem("CurUser",JSON.stringify(res.data))
+                sessionStorage.setItem("CurUser",JSON.stringify(res.data.user))
+                console.log(res.data.menu)
+                this.$store.commit("setMenu",res.data.menu)
                 this.$router.replace('IndexPage');
               }else{
                 this.confirm_disabled=false;
