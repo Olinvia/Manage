@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.example.demo.common.QueryPageParam;
 import com.example.demo.common.Result;
+import com.example.demo.entity.Goods;
+import com.example.demo.entity.Menu;
 import com.example.demo.entity.Storage;
 import com.example.demo.entity.User;
-import com.example.demo.service.IStorageService;
+import com.example.demo.service.IGoodsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,61 +24,65 @@ import java.util.List;
  * </p>
  *
  * @author lxq
- * @since 2023-10-30
+ * @since 2023-10-31
  */
 @RestController
-@RequestMapping("/storage")
-public class StorageController {
-
+@RequestMapping("/goods")
+public class GoodsController {
     @Autowired
-    private IStorageService storageService;
+    private IGoodsService goodsService;
 
     //新增
     @PostMapping("/save")
-    public Result save(@RequestBody Storage storage){
-        return storageService.save(storage)?Result.success():Result.fail();
+    public Result save(@RequestBody Goods goods){
+        return goodsService.save(goods)?Result.success():Result.fail();
     }
     //修改
     @PostMapping("/mod")
-    public Result mod(@RequestBody Storage storage){
-        return storageService.updateById(storage)?Result.success():Result.fail();
+    public Result mod(@RequestBody Goods goods){
+        return goodsService.updateById(goods)?Result.success():Result.fail();
     }
     //新增或修改
     @PostMapping("/saveormod")
-    public boolean saveormod(@RequestBody Storage storage){
-        return storageService.saveOrUpdate(storage);
+    public boolean saveormod(@RequestBody Goods goods){
+        return goodsService.saveOrUpdate(goods);
     }
 
     //删除
     @PostMapping("/delete")
     public Result delete(Integer id){
-        return storageService.removeById(id)?Result.success():Result.fail();
+        return goodsService.removeById(id)?Result.success():Result.fail();
     }
 
     @PostMapping("/result")
     public Result ListResult(@RequestBody QueryPageParam query){
 
-        Page<Storage> page = new Page();
+        Page<Goods> page = new Page();
         page.setCurrent(query.getPageNum());
         page.setSize(query.getPageSize());
 
         HashMap param = query.getParam();
         String name = (String)param.get("name");
+        String storage = (String)param.get("storage");
+        String goodstype = (String)param.get("goodstype");
 
-        LambdaQueryWrapper<Storage> lambdaQueryWrapper = new LambdaQueryWrapper<Storage>();
+
+        LambdaQueryWrapper<Goods> lambdaQueryWrapper = new LambdaQueryWrapper<Goods>();
         if(StringUtils.isNotBlank(name) && !"null".equals(name)){
-            lambdaQueryWrapper.like(Storage::getName,name);
+            lambdaQueryWrapper.like(Goods::getName,name);
+        }
+        if(StringUtils.isNotBlank(storage) && !"null".equals(storage)){
+            lambdaQueryWrapper.eq(Goods::getStorage,storage);
         }
 
-        IPage result = storageService.pageCC(page,lambdaQueryWrapper);
+        if(StringUtils.isNotBlank(goodstype) && !"null".equals(goodstype)){
+            lambdaQueryWrapper.eq(Goods::getGoodstype,goodstype);
+        }
+
+        IPage result = goodsService.pageCC(page,lambdaQueryWrapper);
 
         return Result.success(result.getTotal(),result.getRecords());
     }
 
-    @GetMapping("/list")
-    public Result list(){
-        List list = storageService.list();
-        return !list.isEmpty() ?Result.success(list):Result.fail();
-    }
 
 }

@@ -1,15 +1,24 @@
 <template>
   <div>
     <div style="margin-bottom: 5px;">
-      <el-input v-model="name" placeholder="请输入名字" style="width: 200px"
+      <el-input v-model="name" placeholder="请输入物品名" style="width: 200px"
                 suffix-icon="el-icon-search" @keyup.enter.native="loadPost"></el-input>
 
-      <el-select v-model="sex" filterable placeholder="请选择性别" style="margin-left: 15px;">
+      <el-select v-model="storage" placeholder="请选择仓库">
         <el-option
-            v-for="item in sexs"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
+            v-for="item in storageData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
+        </el-option>
+      </el-select>
+
+      <el-select v-model="goodstype" placeholder="请选择物品分类">
+        <el-option
+            v-for="item in goodstypeData"
+            :key="item.id"
+            :label="item.name"
+            :value="item.id">
         </el-option>
       </el-select>
 
@@ -23,27 +32,17 @@
     <el-table :data="tableData" :header-cell-style="{backgroundColor:'#f2f5fc'}" border>
       <el-table-column prop="id" label="id" width="60" align="center">
       </el-table-column>
-      <el-table-column prop="num" label="账号" width="180" align="center">
+      <el-table-column prop="name" label="物品名" width="180" align="center">
       </el-table-column>
-      <el-table-column prop="userName" label="姓名" width="180" align="center">
+      <el-table-column prop="storage" label="仓库" width="180" align="center"
+                      :formatter="formatStorage">
       </el-table-column>
-      <el-table-column prop="age" label="年龄" width="80" align="center">
+      <el-table-column prop="goodstype" label="物品类名" width="180" align="center"
+                       :formatter="formatGoodstype">
       </el-table-column>
-      <el-table-column prop="sex" label="性别" width="80" align="center">
-        <template slot-scope="scope">
-          <el-tag
-              :type="scope.row.sex === 1 ? 'primary':'success'"
-              disable-transitions>{{scope.row.sex === 1 ? '男':'女'}}</el-tag>
-        </template>
+      <el-table-column prop="count" label="数量" width="180" align="center">
       </el-table-column>
-      <el-table-column prop="roleId" label="角色" width="180" align="center">
-        <template slot-scope="scope">
-          <el-tag
-              :type="scope.row.roleId === 0 ? 'danger': (scope.row.roleId === 1 ? 'primary': 'success')"
-              disable-transitions>{{scope.row.roleId === 0 ? '超级管理员': (scope.row.roleId === 1 ? '管理员': '普通用户')}}</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="phone" label="电话" width="180" align="center">
+      <el-table-column prop="remark" label="备注" width="300" align="center">
       </el-table-column>
       <el-table-column prop="operate" label="操作" width="180" align="center">
         <template slot-scope="scope">
@@ -69,31 +68,35 @@
         width="30%"
         center>
       <el-form ref="form" :rules="rules" :model="form" label-width="80px">
-        <el-form-item label="账号" prop="num">
-          <el-input style="width: 200px" v-model="form.num"></el-input>
+        <el-form-item label="物品名" prop="name">
+          <el-input style="width: 200px" v-model="form.name"></el-input>
+        </el-form-item>
+        <el-form-item label="仓库" prop="storage">
+          <el-select v-model="form.storage" placeholder="请选择仓库">
+            <el-option
+                v-for="item in storageData"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="物品类名" prop="goodstype">
+          <el-select v-model="form.goodstype" placeholder="请选择仓库">
+            <el-option
+                v-for="item in storageData"
+                :key="item.id"
+                :label="item.name"
+                :value="item.id">
+            </el-option>
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数量" prop="count">
+          <el-input style="width: 200px" v-model="form.count"></el-input>
         </el-form-item>
 
-        <el-form-item label="密码" prop="ps">
-          <el-input style="width: 200px" v-model="form.ps"></el-input>
-        </el-form-item>
-
-        <el-form-item label="名字" prop="userName">
-          <el-input style="width: 200px" v-model="form.userName"></el-input>
-        </el-form-item>
-
-        <el-form-item label="年龄" prop="age">
-          <el-input style="width: 200px" v-model="form.age"></el-input>
-        </el-form-item>
-
-        <el-form-item label="性别" prop="sex">
-          <el-radio-group v-model="form.sex">
-            <el-radio label="1">男</el-radio>
-            <el-radio label="0">女</el-radio>
-          </el-radio-group>
-        </el-form-item>
-
-        <el-form-item label="电话" prop="phone">
-          <el-input style="width: 200px" v-model="form.phone"></el-input>
+        <el-form-item label="备注" prop="remark">
+          <el-input type="textarea" style="width: 200px" v-model="form.remark"></el-input>
         </el-form-item>
 
       </el-form>
@@ -111,90 +114,68 @@
 
 <script>
 export default {
-  name: "UserManage",
+  name: "GoodsManage",
   data() {
-    let checkAge = (rule, value, callback)=>{
-      if(value>150){
-        callback(new Error("你是王八吗这么能活？"));
+    let checkCount = (rule,value,callback)=>{
+      if(value > 9999){
+        callback(new Error('数量过大！'));
       }else{
         callback();
       }
     };
-    let checkDuplicate = (rule,value,callback)=>{
-      if(this.form.id){
-        return callback();
-      }
-      this.$axios.post(this.$httpUrl+"/user/findByNum?num="+this.form.num).then(res=>res.data).then(res=>{
-        if(res.code === 400){
-          callback();
-        }else{
-          callback(new Error('该账号已存在！'));
-        }
-      })
-    };
     return {
+      goodstypeData: [],
+      storageData: [],
       tableData: [],
       pageSize: 10,
       pageNum: 1,
       total: 0,
       name:'',
-      sex:'',
-      sexs:[
-        {
-          value: '1',
-          label: '男'
-        },{
-          value: '0',
-          label: '女'
-        }
-      ],
+      storage: '',
+      goodstype: '',
       centerDialogVisible:false,
       form:{
         id:'',
-        num:'',
-        ps:'',
-        userName:'',
-        age:'',
-        phone:'',
-        sex:'1',
-        roleId:'2'
+        name:'',
+        storage:'',
+        goodstype:'',
+        count:'',
+        remark:''
       },
       rules:{
-        userName:[
-          {required: true,message: '请输入名字', trigger: 'blur'},
-          {min: 3,max: 8,message: '长度在3到8个字符之间',trigger: 'blur'}
+        name:[
+          {required: true,message: '请输入物品名', trigger: 'blur'},
+          {min: 1,max: 8,message: '长度在1到8个字符之间',trigger: 'blur'}
         ],
-        num:[
-          {required: true,message: '请输入账号', trigger: 'blur'},
-          {min: 1,max: 20,message: '长度在1到20个字符之间',trigger: 'blur'},
-          {validator: checkDuplicate, trigger: 'blur'}
+        storage:[
+          {required: true,message: '请选择仓库名', trigger: 'blur'}
         ],
-        ps:[
-          {required: true,message: '请输入密码', trigger: 'blur'},
-          {min: 1,max: 20,message: '长度在1到20个字符之间',trigger: 'blur'}
+        goodstype:[
+          {required: true,message: '请选择物品类型', trigger: 'blur'}
         ],
-        age:[
-          {required: true,message: '请输入年龄', trigger: 'blur'},
-          {min: 1,max: 3,message: '年龄在1到999之间',trigger: 'blur'},
-          {pattern: /^([1-9][0-9]*){1,3}$/, message: "年龄必须为正整数", trigger: 'blur' },
-          {validator: checkAge, trigger: 'blur'}
-        ],
-        phone:[
-          {required: true,message: '请输入手机号', trigger: 'blur'},
-          {pattern: /^1[3|4|5|6|7|8|9][0-9]\d{8}$/, message: "请输入正确的手机号码", trigger: "blur"}
+        count:[
+          {required: true,message: '请输入数量', trigger: 'blur'},
+          {pattern: /^([1-9][0-9]*){1,4}$/, message: '数量必须为正整数', trigger: 'blur'},
+          {validator: checkCount, trigger: 'blur'}
         ]
-
-
       }
     }
   },
   methods:{
-    loadGet(){
-      this.$axios.post(this.$httpUrl+'/user/list').then(res=>res.data).then(res=>{
-        console.log(res)
-        this.tableData=res
+    formatStorage(row){
+      let temp = this.storageData.find(item=>{
+        return item.id == row.storage
       })
+      return temp && temp.name
     },
+
+    formatGoodstype(row){
+      let temp = this.goodstypeData.find(item=>{
+        return item.id == row.goodstype
+      })
+      return temp && temp.name
+    },
+
     resetForm(){
       this.$refs.form.resetFields();
     },
@@ -208,18 +189,15 @@ export default {
       this.centerDialogVisible = true;
       this.$nextTick(()=>{
         this.form.id = row.id;
-        this.form.num = row.num;
-        this.form.sex = row.sex+'';
-        this.form.userName = row.userName;
-        this.form.ps = '';
-        this.form.phone = row.phone;
-        this.form.age = row.age+'';
+        this.form.name = row.name;
+        this.form.storage = row.storage;
+        this.form.goodstype = row.goodstype;
+        this.form.count = row.count;
+        this.form.remark = row.remark;
       })
-
-
     },
     del(id){
-      this.$axios.post(this.$httpUrl+'/user/delete?id='+id).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goods/delete?id='+id).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '删除成功！',
@@ -235,7 +213,7 @@ export default {
       })
     },
     doSave(){
-      this.$axios.post(this.$httpUrl+'/user/save',this.form).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goods/save',this.form).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '插入成功！',
@@ -252,7 +230,7 @@ export default {
       })
     },
     doMod(){
-      this.$axios.post(this.$httpUrl+'/user/mod',this.form).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goods/mod',this.form).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '修改成功！',
@@ -286,19 +264,19 @@ export default {
     },
     resetParam(){
       this.name = ''
-      this.sex=''
+      this.storage=''
+      this.goodstype=''
     },
     loadPost(){
-      this.$axios.post(this.$httpUrl+'/user/result',{
+      this.$axios.post(this.$httpUrl+'/goods/result',{
         pageSize: this.pageSize,
         pageNum: this.pageNum,
         param:{
           name:this.name,
-          sex:this.sex,
-          roleId:'2'
+          storage: this.storage+'',
+          goodstype: this.goodstype+''
         }
       }).then(res=>res.data).then(res=>{
-        console.log(res)
         if(res.code == 200){
           this.tableData=res.data
           this.total=res.total
@@ -307,6 +285,27 @@ export default {
         }
       })
     },
+
+    loadStorage(){
+      this.$axios.get(this.$httpUrl+'/storage/list').then(res=>res.data).then(res=>{
+        if(res.code == 200){
+          this.storageData=res.data
+        }else{
+          alert("获取仓库数据失败！")
+        }
+      })
+    },
+
+    loadGoodstype(){
+      this.$axios.get(this.$httpUrl+'/goodstype/list').then(res=>res.data).then(res=>{
+        if(res.code == 200){
+          this.goodstypeData=res.data
+        }else{
+          alert("获取仓库数据失败！")
+        }
+      })
+    },
+
     handleSizeChange(val) {
       console.log(`每页 ${val} 条`);
       this.pageNum=1
@@ -320,7 +319,8 @@ export default {
     }
   },
   beforeMount() {
-    //this.loadGet();
+    this.loadStorage();
+    this.loadGoodstype();
     this.loadPost();
   }
 };

@@ -1,7 +1,7 @@
 <template>
   <div>
     <div style="margin-bottom: 5px;">
-      <el-input v-model="name" placeholder="请输入仓库名" style="width: 200px"
+      <el-input v-model="name" placeholder="请输入物品类名" style="width: 200px"
                 suffix-icon="el-icon-search" @keyup.enter.native="loadPost"></el-input>
 
       <el-button type="primary" style="margin-left: 5px;" @click="loadPost">查询</el-button>
@@ -14,7 +14,7 @@
     <el-table :data="tableData" :header-cell-style="{backgroundColor:'#f2f5fc'}" border>
       <el-table-column prop="id" label="id" width="60" align="center">
       </el-table-column>
-      <el-table-column prop="name" label="仓库名" width="180" align="center">
+      <el-table-column prop="name" label="物品类名" width="180" align="center">
       </el-table-column>
       <el-table-column prop="remark" label="备注" width="300" align="center">
       </el-table-column>
@@ -65,7 +65,7 @@
 
 <script>
 export default {
-  name: "StorageManage",
+  name: "GoodstypeManage",
   data() {
     return {
       tableData: [],
@@ -81,7 +81,7 @@ export default {
       },
       rules:{
         name:[
-          {required: true,message: '请输入仓库', trigger: 'blur'},
+          {required: true,message: '请输入物品类名', trigger: 'blur'},
           {min: 1,max: 8,message: '长度在1到8个字符之间',trigger: 'blur'}
         ]
       }
@@ -106,7 +106,7 @@ export default {
       })
     },
     del(id){
-      this.$axios.post(this.$httpUrl+'/storage/delete?id='+id).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goodstype/delete?id='+id).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '删除成功！',
@@ -122,7 +122,7 @@ export default {
       })
     },
     doSave(){
-      this.$axios.post(this.$httpUrl+'/storage/save',this.form).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goodstype/save',this.form).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '插入成功！',
@@ -139,7 +139,7 @@ export default {
       })
     },
     doMod(){
-      this.$axios.post(this.$httpUrl+'/storage/mod',this.form).then(res=>res.data).then(res=>{
+      this.$axios.post(this.$httpUrl+'/goodstype/mod',this.form).then(res=>res.data).then(res=>{
         if(res.code === 200){
           this.$message({
             message: '修改成功！',
@@ -175,7 +175,7 @@ export default {
       this.name = ''
     },
     loadPost(){
-      this.$axios.post(this.$httpUrl+'/storage/result',{
+      this.$axios.post(this.$httpUrl+'/goodstype/result',{
         pageSize: this.pageSize,
         pageNum: this.pageNum,
         param:{

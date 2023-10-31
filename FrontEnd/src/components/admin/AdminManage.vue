@@ -273,8 +273,10 @@ export default {
         if(valid){
           if(this.form.id){
             this.doMod();
+            this.form.id='';
           }else{
             this.doSave();
+            this.form.id='';
           }
         }else{
           console.log('wrong submit');
